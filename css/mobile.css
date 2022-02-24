@@ -1,0 +1,206 @@
+@media screen and (max-width: 1099px){    
+    .main{
+        width: 100%;
+        position: absolute;
+        top: 10%;
+    }
+    .single-quiz, .owner-quiz{
+        width: 90%;
+        height: 30%;
+        margin-top: 10%;
+        margin-left: 5%;
+        position: relative;
+        border-radius: 1vmax;
+        cursor: pointer;
+    }
+    .overlap{
+        z-index: 1;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background-image: linear-gradient(to top, black, rgba(0, 0, 0, 0));
+        border-radius: 1vmax;
+    }
+    .thumb-quiz{
+        width: 100%;
+        height: 100%;
+        border-radius: 1vmax;
+    }
+    .thumb-quiz > img{
+        width: 100%;
+        height: 100%;
+        border-radius: 1vmax;
+    }
+    .title-quiz{
+        z-index: 2;
+        position: absolute;
+        bottom: 2%;
+        width: 100%;
+        color: white;
+        word-wrap: break-word;
+        font-weight: bolder;
+    }
+    .quizes{
+        width: 90%;
+        height: 50vh;
+        margin-left: 5%;
+        margin-top: 10%;
+        position: relative;
+    }
+    .image-single-quiz{
+        position: relative;
+        width: 100%;
+        height: 30%;
+    }
+    .image-single-quiz > img{
+        width: 100%;
+        height: 100%;
+    }
+    .quiz-title{
+        width: 50%;
+        z-index: 1;
+        position: absolute;
+        left: 25%;
+        top: 25%;
+        color: white;
+        text-align: center;
+        word-wrap: break-word;
+    }
+    .overlap-banner-quiz{
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    .main-container-questions, .subcontainer-question{
+        margin-top: 10%;
+    }
+    .quiz-question{
+        width: 90%;
+        margin-left: 5%;
+        color: white;
+        text-align: center;
+    }
+    .quiz-question > p, .title-level > p{
+        padding: 5%;
+        word-wrap: break-word;
+    }
+    .container-answers{
+        height: 95%;
+        width: 90%;
+        margin-left: 5%;
+    }
+    .answers-row{
+        display: flex;
+        width: 100%;
+        margin-top: 2%;
+        justify-content: space-between;
+    }
+    .single-answer{
+        height: 50%;
+        width: 48%;
+        border-radius: 1.5vmax;
+    }
+    .single-answer > img{
+        height: 100%;
+        width: 100%;
+        border-radius: 1.5vmax;
+    }
+    .title-answer{
+        width: 100%;
+        word-wrap: break-word;
+        text-align: center;
+    }
+    .level-user-card{
+        width: 90%;
+        margin-top: 10%;
+        margin-left: 5%;
+    }
+    .title-level, .text-level{
+        width: 100%;
+        color: white;
+        word-wrap: break-word;
+        background-color: black;
+    }
+    .title-level{ 
+        text-align: center; 
+    }
+    .text-level > p{
+        padding: 2%;
+    }
+    .img-level, .img-level > img{
+        width: 100%;
+        height: 100%;
+    }
+    .buttons-quiz-page{
+        width:90%;
+        margin-left: 5%;
+        margin-top: 5%;
+        padding-bottom: 5%;
+    }
+    .buttons-quiz-page > div > button, .btn-next > input{
+        border: none;
+        width: 100%;
+        padding: 5%;
+        border-radius: 2vmax;
+        cursor: pointer;
+    }
+    .reset-button, .back-home-button{
+        width: 50%;
+        margin-left: 25%;
+    }
+    .reset-button > button, .btn-next > input{
+        background-color: #EC362D;
+    }
+    .section-basic-info, .container-basic-info, 
+    .section-create-questions, .container-questions-info{
+        width: 100%;
+    }
+    .start, .fields{
+        width: 90%;
+        margin-left: 5%;
+    }
+    .start > p{
+        padding: 6%;
+        word-wrap: break-word;
+        font-weight: bold;
+        text-align: center;
+    }
+    .single-field{
+        margin-top: 3%;
+        background-color: grey;
+    }
+    .single-field > input{
+        width: 94%;
+        padding: 3%;
+        border: 1px;
+    }
+    .btn-next{
+        margin-top: 6%;
+    }
+    .btn-next > input{
+        color: white;
+        font-weight: bold;
+    }
+    .label-create-level{
+        width: 100%;
+        position: relative;
+        background-color: grey;
+        cursor: pointer;
+    }
+    .label-create-level > p{
+        padding: 3%;
+        word-wrap: break-word;
+        font-weight: bold;
+    }
+    .label-create-level > span {
+        position: absolute;
+        top: 25%;
+        right: 5%;
+    }
+    .non-visible{
+        display: none;
+    }
+}
