@@ -1,9 +1,22 @@
 //https://github.com/JsonLucas/rebuild-Projeto-06.git
 
+const createQuizData = {
+    quizTitle:'',
+    urlImageQuiz: '',
+    numQuestions: 0,
+    numLevels: 0
+}
+const validateUrl = {
+    http: 'http://',
+    https: 'https://'
+}
+
 let indexAnswer = 0;
 let indexScroll = 0;
 let userAnswers = [];
 let chosenQuiz;
+
+
 function loadQuiz(){
     document.querySelector('.main').innerHTML = '<section class="page-body"></section>';
     const request = axios.get('https://mock-api.driven.com.br/api/v4/buzzquizz/quizzes');
@@ -259,14 +272,15 @@ function renderCreateBasicQuizInfo(){
                     <div class='single-field'>
                         <input type='text' class='field' placeholder='Título do seu quiz'>
                     </div><div class='single-field'>
-                        <input type='text' class='field' placeholder='URL da imagem do seu quiz'>
+                        <input type='text' class='field image-url' placeholder='URL da imagem do seu quiz'>
                     </div><div class='single-field'>
                         <input type='number' class='field' placeholder='Quantidade de perguntas do seu quiz'>
                     </div><div class='single-field'>
                         <input type='number' class='field' placeholder='Quantidade de níveis do seu quiz'>
                     </div><div class='btn-next'>
-                        <input type='button' onclick='renderCreateQuizQuestions();' 
-                        value='Prosseguir para criar perguntas'></div>
+                        <input type='button' onclick='formatBasicData();' 
+                        value='Prosseguir para criar perguntas'>
+                    </div>
                 </div>
             </div>
         </section>
@@ -278,28 +292,32 @@ function renderCreateQuizQuestions(){
     main.innerHTML = `<section class='section-create-questions'>
         <div class='container-questions-info'>
             <div class='start'><p>Crie suas perguntas</p></div>`;
-    const numQuestions = prompt('digite quantas perguntas deseja criar.');
-    for(let i = 0; i < parseInt(numQuestions); i++){
+    for(let i = 0; i < parseInt(createQuizData.numQuestions); i++){
         main.innerHTML += `
             <div class='create-level' id='question-${i}'>
-                <div class='label-create-level' id='label-${i}' onclick='renderDropdownFields(this);'><p>Pergunta ${(i+1)}</p>
-                <span><ion-icon name="create-outline"></ion-icon></span></div>
+                <div class='label-create-level' id='label-${i}'>
+                    <p>Pergunta ${(i+1)}</p>
+                    <span><ion-icon name="create-outline"></ion-icon></span>
+                </div>
+                ${renderDropdownQuestionsFields()}
             </div>
         `;
+        document.querySelector(`#label-${i}`).setAttribute('onclick', 'toggleFields(this);');
     }
-    main.innerHTML += `</div></section>`;
+    main.innerHTML += `<div class='btn-next'>
+        <input type='button' onclick='formatQuestionsData();' 
+        value='Prosseguir para criar níveis'>
+    </div></div></section>`;
 }
 
-function renderDropdownFields(object){
-    const parent = document.querySelector(`#${object.id}`).parentElement;
-    parent.addEventListener('click', dropdownFields);
-    parent.innerHTML += `<div class='container-fields non-visible'>
+function renderDropdownQuestionsFields(){
+    return `<div class='container-fields non-visible'>
         <div class='label-create-level'><p>Resposta correta</p></div>
         <div class='fields'>
             <div class='single-field'>
                 <input type='text' class='field' placeholder='Resposta correta'>
             </div><div class='single-field'>
-                <input type='text' class='field' placeholder='URL da imagem'>
+                <input type='text' class='field image-url' placeholder='URL da imagem'>
             </div>
         </div>
         <div class='label-create-level'><p>Respostas incorretas</p></div>
@@ -307,35 +325,150 @@ function renderDropdownFields(object){
             <div class='single-field'>
                 <input type='text' class='field' placeholder='Resposta incorreta 1'>
             </div><div class='single-field'>
-                <input type='text' class='field' placeholder='URL da imagem'>
+                <input type='text' class='field image-url' placeholder='URL da imagem'>
             </div>
         </div>
         <div class='fields'>
             <div class='single-field'>
                 <input type='text' class='field' placeholder='Resposta incorreta 2'>
             </div><div class='single-field'>
-                <input type='text' class='field' placeholder='URL da imagem'>
+                <input type='text' class='field image-url' placeholder='URL da imagem'>
             </div>
         </div>
         <div class='fields'>
             <div class='single-field'>
                 <input type='text' class='field' placeholder='Resposta incorreta 3'>
             </div><div class='single-field'>
-                <input type='text' class='field' placeholder='URL da imagem'>
+                <input type='text' class='field image-url' placeholder='URL da imagem'>
             </div>
         </div>
     </div>`;
 }
 
-function dropdownFields(){
-    const containerFields = document.querySelector(`#${this.id} > .container-fields`);
-    console.log(containerFields);
-    containerFields.classList.remove('non-visible');
-    window.addEventListener('click', (e) => {
-        console.log(e.target);
-        /*
-        if(e.target === containerFields.children){
-            console.log('teste');
-        }*/
-    })
+function toggleFields(object){
+    const parent = document.querySelector(`#${object.id}`).parentElement;
+    document.querySelector(`#${parent.id} > .container-fields`).classList.toggle('non-visible');
+}
+
+function formatBasicData(){
+    const inputs = document.querySelectorAll('.field');
+    let isValid = true;
+    if(!isEmpty(inputs)){
+        for(let i = 0; i < inputs.length; i++){
+            switch(i){
+                case 0:
+                createQuizData.quizTitle = inputs[i].value;
+                break;
+                case 1:
+                if((validateUrl.http === inputs[i].value.substring(0, 7)) || 
+                (validateUrl.https === inputs[i].value.substring(0, 8))){
+                    createQuizData.urlImageQuiz = inputs[i].value;
+                }else{
+                    isValid = false;
+                    alert('voce precisa inserir uma url válida para a imagem.');
+                    renderCreateBasicQuizInfo();
+                }
+                break;
+                case 2:
+                if(parseInt(inputs[i].value) >= 2){
+                    createQuizData.numQuestions = inputs[i].value;
+                }else{
+                    isValid = false;
+                    alert('seu quiz deve ter ao menos duas perguntas.');
+                    renderCreateBasicQuizInfo();
+                }
+                break;
+                case 3:
+                if(parseInt(inputs[i].value) >= 1){
+                    createQuizData.numLevels = inputs[i].value;
+                }else{
+                    isValid = false;
+                    alert('seu quiz deve ter ao menos um nível.');
+                    renderCreateBasicQuizInfo();
+                }
+                break;
+            }
+        }
+        if(isValid){
+            renderCreateQuizQuestions();
+        }
+    }else{
+        alert('Todos os campos precisam ser preenchidos.');
+        renderCreateBasicQuizInfo();
+    }
+}
+
+function formatQuestionsData(){
+    const fields = document.querySelectorAll('.field');
+    if(!isEmpty(fields)){
+        const imageUrl = document.querySelectorAll('.image-url');
+        let isValid = true;
+        for(let i = 0; i < imageUrl.length; i++){
+            if(!(validateUrl.http !== imageUrl[i].value.substring(0, 7)) || 
+            (validateUrl.https !== imageUrl[i].value.substring(0, 8))){
+                renderCreateQuizQuestions();
+                break;
+            }
+        }
+        if(isValid){
+            renderCreateQuizLevels();
+        }
+    }else{
+        alert('todos os campos precisam ser preenchidos.');
+        renderCreateQuizQuestions();
+    }
+}
+
+function formatLevelsData(){
+    console.log('testando');
+}
+
+function renderCreateQuizLevels(){
+    const main = document.querySelector('.main');
+    main.innerHTML = `<section class='section-create-levels'>
+        <div class='container-levels-info'>
+            <div class='start'><p>Agora, decida os níveis</p></div>`;
+    for(let i = 0; i < parseInt(createQuizData.numLevels); i++){
+        main.innerHTML += `
+            <div class='create-level' id='question-${i}'>
+                <div class='label-create-level' id='label-${i}'>
+                    <p>Nível ${(i+1)}</p>
+                    <span><ion-icon name="create-outline"></ion-icon></span>
+                </div>
+                ${renderDropdownLevelFields()}
+            </div>
+        `;
+        document.querySelector(`#label-${i}`).setAttribute('onclick', 'toggleFields(this);');
+    }
+    main.innerHTML += `<div class='btn-next'>
+        <input type='button' onclick='formatLevelsData();' 
+        value='Finalizar Quizz'>
+    </div></div></section>`;
+}
+
+function renderDropdownLevelFields(){
+    return `<div class='container-fields non-visible'>
+        <div class='label-create-level'><p>Resposta correta</p></div>
+        <div class='fields'>
+            <div class='single-field'>
+                <input type='text' class='field' placeholder='Título do nível'>
+            </div><div class='single-field'>
+                <input type='text' class='field' placeholder='% de acertos mínimo'>
+            </div><div class='single-field'>
+                <input type='text' class='field' placeholder='URL da imagem do nível'>
+            </div><div class='single-field'>
+                <textarea class='field' placeholder='Descrição do nível'></textarea>
+            </div>
+        </div>
+    </div>`;
+}
+
+function isEmpty(inputs){
+    let verificator = false;
+    for(let i = 0; i < inputs.length; i++){
+        if(inputs[i].value === ''){
+            verificator = true;
+        }
+    }
+    return verificator;
 }

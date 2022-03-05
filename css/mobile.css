@@ -1,3 +1,6 @@
+body{
+    background-color: #eee;
+}
 @media screen and (max-width: 1099px){    
     .main{
         width: 100%;
@@ -122,7 +125,6 @@
         width: 100%;
         color: white;
         word-wrap: break-word;
-        background-color: black;
     }
     .title-level{ 
         text-align: center; 
@@ -170,9 +172,8 @@
     }
     .single-field{
         margin-top: 3%;
-        background-color: grey;
     }
-    .single-field > input{
+    .single-field > input, .single-field > textarea{
         width: 94%;
         padding: 3%;
         border: 1px;
@@ -187,7 +188,6 @@
     .label-create-level{
         width: 100%;
         position: relative;
-        background-color: grey;
         cursor: pointer;
     }
     .label-create-level > p{
