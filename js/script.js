@@ -10,6 +10,25 @@ const validateUrl = {
     http: 'http://',
     https: 'https://'
 }
+let quizData = [/*{
+    title: '',
+    image: '',
+    questions: [{
+        title: '',
+        color: '',
+        answers: [{
+            text: '',
+            image: '',
+            isCorrectAnswer: false
+        }]
+    }],
+    levels: [{
+        title: '',
+        image: '',
+        text: '',
+        minValue: 0
+    }]
+}*/];
 
 let indexAnswer = 0;
 let indexScroll = 0;
@@ -50,7 +69,7 @@ function renderSingleQuiz(object){
     request.then((response) => {
         const main = document.querySelector('.main');
         const questions = response.data.questions;
-        main.innerHTML = '';
+        console.log(response.data);
         main.innerHTML = `<div class='image-single-quiz'>
             <div class='overlap-banner-quiz'></div>
             <img src='${response.data.image}' alt='Imagem não carregada.'>
@@ -270,7 +289,7 @@ function renderCreateBasicQuizInfo(){
                 <div class='start'><p>Comece pelo começo</p></div>
                 <div class='fields'>
                     <div class='single-field'>
-                        <input type='text' class='field' placeholder='Título do seu quiz'>
+                        <input type='text' class='field' placeholder='Título do seu quiz' minlength='20' maxlength='65'>
                     </div><div class='single-field'>
                         <input type='text' class='field image-url' placeholder='URL da imagem do seu quiz'>
                     </div><div class='single-field'>
@@ -299,7 +318,7 @@ function renderCreateQuizQuestions(){
                     <p>Pergunta ${(i+1)}</p>
                     <span><ion-icon name="create-outline"></ion-icon></span>
                 </div>
-                ${renderDropdownQuestionsFields()}
+                ${renderDropdownQuestionsFields(i)}
             </div>
         `;
         document.querySelector(`#label-${i}`).setAttribute('onclick', 'toggleFields(this);');
@@ -310,117 +329,46 @@ function renderCreateQuizQuestions(){
     </div></div></section>`;
 }
 
-function renderDropdownQuestionsFields(){
+function renderDropdownQuestionsFields(index){
     return `<div class='container-fields non-visible'>
+        <div class='fields'>
+            <div class='single-field'>
+                <input type='text' class='title-question' placeholder='Texto da pergunta' minlength='20'>
+            </div><div class='single-field'>
+                <input type='text' class='bg-color' placeholder='Cor de fundo da pergunta(ex: #ffffff)' minlength='7' maxlength='7'>
+            </div>
+        </div>
         <div class='label-create-level'><p>Resposta correta</p></div>
         <div class='fields'>
             <div class='single-field'>
-                <input type='text' class='field' placeholder='Resposta correta'>
+                <input type='text' class='field answer-${index}' placeholder='Resposta correta'>
             </div><div class='single-field'>
-                <input type='text' class='field image-url' placeholder='URL da imagem'>
+                <input type='text' class='field image-url image-${index}' placeholder='URL da imagem'>
             </div>
         </div>
         <div class='label-create-level'><p>Respostas incorretas</p></div>
         <div class='fields'>
             <div class='single-field'>
-                <input type='text' class='field' placeholder='Resposta incorreta 1'>
+                <input type='text' class='field answer-${index}' placeholder='Resposta incorreta 1'>
             </div><div class='single-field'>
-                <input type='text' class='field image-url' placeholder='URL da imagem'>
+                <input type='text' class='field image-url image-${index}' placeholder='URL da imagem'>
             </div>
         </div>
         <div class='fields'>
             <div class='single-field'>
-                <input type='text' class='field' placeholder='Resposta incorreta 2'>
+                <input type='text' class='field answer-${index}' placeholder='Resposta incorreta 2'>
             </div><div class='single-field'>
-                <input type='text' class='field image-url' placeholder='URL da imagem'>
+                <input type='text' class='field image-url image-${index}' placeholder='URL da imagem'>
             </div>
         </div>
         <div class='fields'>
             <div class='single-field'>
-                <input type='text' class='field' placeholder='Resposta incorreta 3'>
+                <input type='text' class='field answer-${index}' placeholder='Resposta incorreta 3'>
             </div><div class='single-field'>
-                <input type='text' class='field image-url' placeholder='URL da imagem'>
+                <input type='text' class='field image-url image-${index}' placeholder='URL da imagem'>
             </div>
         </div>
     </div>`;
-}
-
-function toggleFields(object){
-    const parent = document.querySelector(`#${object.id}`).parentElement;
-    document.querySelector(`#${parent.id} > .container-fields`).classList.toggle('non-visible');
-}
-
-function formatBasicData(){
-    const inputs = document.querySelectorAll('.field');
-    let isValid = true;
-    if(!isEmpty(inputs)){
-        for(let i = 0; i < inputs.length; i++){
-            switch(i){
-                case 0:
-                createQuizData.quizTitle = inputs[i].value;
-                break;
-                case 1:
-                if((validateUrl.http === inputs[i].value.substring(0, 7)) || 
-                (validateUrl.https === inputs[i].value.substring(0, 8))){
-                    createQuizData.urlImageQuiz = inputs[i].value;
-                }else{
-                    isValid = false;
-                    alert('voce precisa inserir uma url válida para a imagem.');
-                    renderCreateBasicQuizInfo();
-                }
-                break;
-                case 2:
-                if(parseInt(inputs[i].value) >= 2){
-                    createQuizData.numQuestions = inputs[i].value;
-                }else{
-                    isValid = false;
-                    alert('seu quiz deve ter ao menos duas perguntas.');
-                    renderCreateBasicQuizInfo();
-                }
-                break;
-                case 3:
-                if(parseInt(inputs[i].value) >= 1){
-                    createQuizData.numLevels = inputs[i].value;
-                }else{
-                    isValid = false;
-                    alert('seu quiz deve ter ao menos um nível.');
-                    renderCreateBasicQuizInfo();
-                }
-                break;
-            }
-        }
-        if(isValid){
-            renderCreateQuizQuestions();
-        }
-    }else{
-        alert('Todos os campos precisam ser preenchidos.');
-        renderCreateBasicQuizInfo();
-    }
-}
-
-function formatQuestionsData(){
-    const fields = document.querySelectorAll('.field');
-    if(!isEmpty(fields)){
-        const imageUrl = document.querySelectorAll('.image-url');
-        let isValid = true;
-        for(let i = 0; i < imageUrl.length; i++){
-            if(!(validateUrl.http !== imageUrl[i].value.substring(0, 7)) || 
-            (validateUrl.https !== imageUrl[i].value.substring(0, 8))){
-                renderCreateQuizQuestions();
-                break;
-            }
-        }
-        if(isValid){
-            renderCreateQuizLevels();
-        }
-    }else{
-        alert('todos os campos precisam ser preenchidos.');
-        renderCreateQuizQuestions();
-    }
-}
-
-function formatLevelsData(){
-    console.log('testando');
 }
 
 function renderCreateQuizLevels(){
@@ -451,16 +399,176 @@ function renderDropdownLevelFields(){
         <div class='label-create-level'><p>Resposta correta</p></div>
         <div class='fields'>
             <div class='single-field'>
-                <input type='text' class='field' placeholder='Título do nível'>
+                <input type='text' class='field level-title' placeholder='Título do nível' minlength='10'>
             </div><div class='single-field'>
-                <input type='text' class='field' placeholder='% de acertos mínimo'>
+                <input type='number' class='field min-score' placeholder='% de acertos mínimo'>
             </div><div class='single-field'>
-                <input type='text' class='field' placeholder='URL da imagem do nível'>
+                <input type='text' class='field image-level-url' placeholder='URL da imagem do nível'>
             </div><div class='single-field'>
-                <textarea class='field' placeholder='Descrição do nível'></textarea>
+                <textarea class='field level-description' minlength='30' placeholder='Descrição do nível'></textarea>
             </div>
         </div>
     </div>`;
+}
+
+function renderViewCreatedQuiz(){
+    const main = document.querySelector('.main');
+    //const request = axios.get();
+    console.log(quizData);
+    main.innerHTML = ``;
+}
+
+function toggleFields(object){
+    const parent = document.querySelector(`#${object.id}`).parentElement;
+    document.querySelector(`#${parent.id} > .container-fields`).classList.toggle('non-visible');
+}
+
+function setQuestionsData(){
+    const titleQuestion = document.querySelectorAll('.title-question');
+    const bgColor = document.querySelectorAll('.bg-color');
+    let questions = [];
+    let auxAnswers = [];
+    for(let i = 0; i < titleQuestion.length; i++){
+        questions.push({title: titleQuestion[i].value, color: bgColor[i].value, answers: ''});
+        const answers = document.querySelectorAll(`.answer-${i}`);
+        const urlImage = document.querySelectorAll(`.image-${i}`);
+        for(let j = 0; j < answers.length; j++){
+            auxAnswers.push({
+                text: answers[j].value, 
+                image: urlImage[j].value, 
+            });
+            if(j === 0){
+                auxAnswers[j].isCorrectAnswer = true;
+            }else{
+                auxAnswers[j].isCorrectAnswer = false;
+            }
+        }
+        questions[i].answers = auxAnswers;
+        auxAnswers = [];
+    }
+    quizData[0].questions = questions;
+    console.log(questions);
+}
+
+function setLevelsData(){
+    const levelTitle = document.querySelectorAll('.level-title');
+    const minScore = document.querySelectorAll('.min-score');
+    const imageLevelUrl = document.querySelectorAll('.image-level-url');
+    const levelDescription = document.querySelectorAll('.level-description');
+    let level = [];
+    for(let i = 0; i < levelTitle.length; i++){
+        level.push({
+            title: levelTitle[i].value,
+            image: imageLevelUrl[i].value,
+            text: levelDescription[i].value,
+            minValue: minScore[i].value
+        });
+    }
+    quizData[0].levels = level;
+    console.log(level);
+}
+
+function formatBasicData(){
+    const inputs = document.querySelectorAll('.field');
+    let isValid = true;
+    if(!isEmpty(inputs)){
+        for(let i = 0; i < inputs.length; i++){
+            switch(i){
+                case 0:
+                createQuizData.quizTitle = inputs[i].value;
+                break;
+                case 1:
+                if(isUrlValid()){
+                    createQuizData.urlImageQuiz = inputs[i].value;
+                }else{
+                    isValid = false;
+                    alert('voce precisa inserir uma url válida para a imagem.');
+                    renderCreateBasicQuizInfo();
+                }
+                break;
+                case 2:
+                if(parseInt(inputs[i].value) >= 3){
+                    createQuizData.numQuestions = inputs[i].value;
+                }else{
+                    isValid = false;
+                    alert('seu quiz deve ter ao menos três perguntas.');
+                    renderCreateBasicQuizInfo();
+                }
+                break;
+                case 3:
+                if(parseInt(inputs[i].value) >= 2){
+                    createQuizData.numLevels = inputs[i].value;
+                }else{
+                    isValid = false;
+                    alert('seu quiz deve ter ao menos dois níveis.');
+                    renderCreateBasicQuizInfo();
+                }
+                break;
+            }
+        }
+        if(isValid){
+            quizData.push({
+                title: createQuizData.quizTitle, 
+                image: createQuizData.urlImageQuiz, 
+                questions: '', 
+                levels: ''
+            });
+            renderCreateQuizQuestions();
+        }
+    }else{
+        alert('Todos os campos precisam ser preenchidos.');
+        renderCreateBasicQuizInfo();
+    }
+}
+
+function formatQuestionsData(){
+    const fields = document.querySelectorAll('.field');
+    if(!isEmpty(fields)){
+        if(isUrlValid()){
+            setQuestionsData();
+            renderCreateQuizLevels();
+        }else{
+            alert('insira urls válidas para imagens');
+            renderCreateQuizQuestions();
+        }
+    }else{
+        alert('todos os campos precisam ser preenchidos.');
+        renderCreateQuizQuestions();
+    }
+}
+
+function formatLevelsData(){
+    const fields = document.querySelectorAll('.field');
+    if(!isEmpty(fields)){
+        if(isUrlValid()){
+            setLevelsData();
+            const request = axios.post('https://mock-api.driven.com.br/api/v4/buzzquizz/quizzes', quizData);
+            request.then((response) => {
+                console.log(response);
+            }).catch((error) => {
+                console.log(error);
+            });
+            renderViewCreatedQuiz();
+        }else{
+            alert('insira urls válidas para imagens');
+            renderCreateQuizLevels();
+        }
+    }else{
+        alert('todos os campos precisam ser preenchidos.');
+        renderCreateQuizLevels();
+    }
+}
+
+function isUrlValid(){
+    const imageUrl = document.querySelectorAll('.image-url');
+    let isValid = true;
+    for(let i = 0; i < imageUrl.length; i++){
+        if((validateUrl.http !== imageUrl[i].value.substring(0, 7)) && 
+        (validateUrl.https !== imageUrl[i].value.substring(0, 8))){
+            isValid = false;
+        }
+    }
+    return isValid;
 }
 
 function isEmpty(inputs){
