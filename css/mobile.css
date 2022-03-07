@@ -10,7 +10,7 @@ body{
     .single-quiz, .owner-quiz{
         width: 90%;
         height: 30%;
-        margin-top: 10%;
+        margin-bottom: 10%;
         margin-left: 5%;
         position: relative;
         border-radius: 1vmax;
@@ -202,5 +202,31 @@ body{
     }
     .non-visible{
         display: none;
+    }
+    .subtitle-created-quizes{
+        width: 90%;
+        height: 50px;
+        margin-left: 5%;
+        position: relative;
+    }
+    .subtitle-created-quizes > p{
+        font-weight: bolder;
+        position: absolute;
+        left: 0;
+        top: 35%;
+    }
+    .btn-create-next-quiz{
+        width: 30px;
+        height: 30px;
+        position: absolute;
+        top: 10px;
+        right: 0;
+        background-color: #EC362D;
+        color: white;
+        font-weight: bolder;
+        border-radius:50%;
+        cursor: pointer;
+        text-align: center;
+        font-size: 3vmax;
     }
 }

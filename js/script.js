@@ -10,25 +10,7 @@ const validateUrl = {
     http: 'http://',
     https: 'https://'
 }
-let quizData = [/*{
-    title: '',
-    image: '',
-    questions: [{
-        title: '',
-        color: '',
-        answers: [{
-            text: '',
-            image: '',
-            isCorrectAnswer: false
-        }]
-    }],
-    levels: [{
-        title: '',
-        image: '',
-        text: '',
-        minValue: 0
-    }]
-}*/];
+let quizData = {};
 
 let indexAnswer = 0;
 let indexScroll = 0;
@@ -41,6 +23,8 @@ function loadQuiz(){
     const request = axios.get('https://mock-api.driven.com.br/api/v4/buzzquizz/quizzes');
     request.then((response) => {
         const quizes = document.querySelector('.page-body');
+        const localData = localStorage.getItem('idCreatedQuiz');
+        const onwerQuizes = JSON.parse(localData);
         renderCreateQuiz(quizes);
         for(let i in response.data){
             quizes.innerHTML += `
@@ -52,14 +36,41 @@ function loadQuiz(){
         }
     }).catch((error) => {
         console.log(error);
-    })
+    });
 }
 
 function renderCreateQuiz(sectionQuizes){
-    sectionQuizes.innerHTML += `
-    <div id='' class='owner-quiz''>
-        <input type='button' value='Criar quiz' class='btn-create-quiz' onclick='renderCreateBasicQuizInfo();'>
-    </div>`
+    const localData = localStorage.getItem('idCreatedQuiz');
+    const onwerQuizes = JSON.parse(localData);
+    if(onwerQuizes !== null){
+        sectionQuizes.innerHTML += `<div class='subtitle-created-quizes'>
+        <p>Seus quizes</p>
+        <div class='btn-create-next-quiz' onclick='renderCreateBasicQuizInfo();'>
+        <ion-icon name="add-outline"></ion-icon></div></div>`;
+        for(let i = 0; i < onwerQuizes.length; i++){
+            renderCreatedQuizes(sectionQuizes, onwerQuizes[i]);
+        }
+    }else{
+        sectionQuizes.innerHTML += `
+        <div id='' class='owner-quiz'>
+            <input type='button' value='Criar quiz' class='btn-create-quiz' onclick='renderCreateBasicQuizInfo();'>
+        </div>`;
+    }
+}
+
+function renderCreatedQuizes(sectionQuizes, quizId){
+    const request = axios.get(`https://mock-api.driven.com.br/api/v4/buzzquizz/quizzes/${quizId}`);
+    request.then((response) => {
+        sectionQuizes.innerHTML += `
+            <div id='${response.data.id}' class='single-quiz' onclick='renderSingleQuiz(this);'>
+                <div class='overlap'></div>
+                <div class='thumb-quiz'><img src='${response.data.image}' alt='Imagem não carregada.'></div>
+                <div class='title-quiz'><p>${response.data.title}</p></div>    
+            </div>`
+    }).catch((error) => {
+        alert('algum erro ocorreu ao carregar seus quizes.');
+        console.log(error);
+    });
 }
 
 function renderSingleQuiz(object){
@@ -411,11 +422,24 @@ function renderDropdownLevelFields(){
     </div>`;
 }
 
-function renderViewCreatedQuiz(){
+function renderViewCreatedQuiz(id){
     const main = document.querySelector('.main');
-    //const request = axios.get();
-    console.log(quizData);
-    main.innerHTML = ``;
+    const request = axios.get(`https://mock-api.driven.com.br/api/v4/buzzquizz/quizzes/${id}`);
+    request.then((response) => {
+        main.innerHTML = `<section class='created-quiz'>
+            <div class='start'><p>Comece pelo começo</p></div>
+            <div id='${response.data.id}' class='single-quiz'>
+                <div class='overlap'></div>
+                <div class='thumb-quiz'><img src='${response.data.image}' alt='Imagem não carregada.'></div>
+                <div class='title-quiz'><p>${response.data.title}</p></div>    
+            </div>
+            <div class='buttons-quiz-page'>
+                <div class='reset-button'><button id='${id}' onclick='renderSingleQuiz(this);'>Acessar quiz</button></div>
+                <div class='back-home-button'><button onclick='backHome();'>Voltar pra Home</button></div></div>
+        </section>`;
+    }).catch((error) => {
+        console.log(error);
+    })
 }
 
 function toggleFields(object){
@@ -446,8 +470,7 @@ function setQuestionsData(){
         questions[i].answers = auxAnswers;
         auxAnswers = [];
     }
-    quizData[0].questions = questions;
-    console.log(questions);
+    quizData.questions = questions;
 }
 
 function setLevelsData(){
@@ -464,8 +487,7 @@ function setLevelsData(){
             minValue: minScore[i].value
         });
     }
-    quizData[0].levels = level;
-    console.log(level);
+    quizData.levels = level;
 }
 
 function formatBasicData(){
@@ -507,12 +529,8 @@ function formatBasicData(){
             }
         }
         if(isValid){
-            quizData.push({
-                title: createQuizData.quizTitle, 
-                image: createQuizData.urlImageQuiz, 
-                questions: '', 
-                levels: ''
-            });
+            quizData.title = createQuizData.quizTitle;
+            quizData.image = createQuizData.urlImageQuiz;
             renderCreateQuizQuestions();
         }
     }else{
@@ -536,19 +554,37 @@ function formatQuestionsData(){
         renderCreateQuizQuestions();
     }
 }
-
+//https://th.bing.com/th/id/OIP.ShF3fM9Ch9yUA4MaYwkI7QHaF8?pid=ImgDet&rs=1
 function formatLevelsData(){
     const fields = document.querySelectorAll('.field');
     if(!isEmpty(fields)){
         if(isUrlValid()){
             setLevelsData();
-            const request = axios.post('https://mock-api.driven.com.br/api/v4/buzzquizz/quizzes', quizData);
+            const body = {
+                title: quizData.title,
+                image: quizData.image,
+                questions: quizData.questions,
+                levels: quizData.levels
+            }
+            console.log(body);
+            const request = axios.post('https://mock-api.driven.com.br/api/v4/buzzquizz/quizzes', body);
             request.then((response) => {
                 console.log(response);
+                const localData = localStorage.getItem('idCreatedQuiz');
+                let onwerQuizes = [];
+                if(localData !== null){
+                    onwerQuizes = JSON.parse(localData);
+                    onwerQuizes.push(response.data.id);
+                }else{
+                    onwerQuizes.push(response.data.id);
+                }
+                localStorage.setItem('idCreatedQuiz', JSON.stringify(onwerQuizes));
+                renderViewCreatedQuiz(response.data.id);
             }).catch((error) => {
+                alert('algum erro ocorreu.');
                 console.log(error);
+                loadQuiz();
             });
-            renderViewCreatedQuiz();
         }else{
             alert('insira urls válidas para imagens');
             renderCreateQuizLevels();
